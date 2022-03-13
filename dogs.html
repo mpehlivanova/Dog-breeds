@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+        #search {
+            display: flex;
+            flex-direction: row;
+            background-color: rgb(196, 194, 194);
+            height: 50px;
+            width: 500px;
+            margin: auto;
+        }
+        
+        #randomDogs {
+            height: 500px;
+            width: 500px;
+            /* border: 2px solid grey; */
+            margin: auto;
+            box-sizing: border-box;
+        }
+        
+        #breedDog {
+            width: 200px;
+        }
+        
+        #imgDogs {
+            margin: auto;
+        }
+        
+        p {
+            padding-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="search">
+        <p>https://dog.ceo/api/breed/</p>
+        <select name="kindDog" id="breedDog">
+        </select>
+        <p>/images/random</p>
+
+    </div>
+    <div id="randomDogs">
+        <img id="imgDogs" width="500x" src="" alt="photo">
+    </div>
+    <script>
+        let select = document.getElementById("breedDog");
+        let isAllLoadBreeds = false;
+
+        function addBreeds() {
+            let request = new XMLHttpRequest();
+            if (!isAllLoadBreeds) {
+                request.open("GET", "https://dog.ceo/api/breeds/list/all");
+                request.onreadystatechange = function() {
+                    if (request.readyState == 4 && request.status >= 200 && request.status <= 299) {
+                        let breeds = JSON.parse(request.responseText).message;
+                        // console.log(breeds);
+                        let arr = Object.keys(breeds);
+                        // console.log(arr);
+                        arr.forEach(el => {
+                            let opt = document.createElement("option");
+                            opt.value = el;
+                            opt.innerHTML = el;
+                            select.appendChild(opt);
+                        });
+                    };
+                };
+                request.send();
+                isAllLoadBreeds = true;
+            }
+        }
+        select.addEventListener("click", function() {
+            addBreeds()
+        });
+        select.addEventListener("change", function(ev) {
+            let index = ev.target.selectedIndex;
+            let option = ev.target.options[index].text;
+            // console.log(option);
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", `https://dog.ceo/api/breed/${option}/images/random`);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299) {
+                    let imgBreed = JSON.parse(xhr.responseText).message;
+                    // console.log(imgBreed);
+                    document.getElementById("imgDogs").src = imgBreed;
+                }
+            }
+            xhr.send();
+        });
+    </script>
+</body>
+
+</html>
